@@ -35,6 +35,10 @@ router.post('/:plantId/reminders', auth, async (req, res) => {
     const { plantId } = req.params;
     const { type, interval, unit } = req.body;
 
+    if (!type || !interval || !unit) {
+      return res.status(400).json({ error: 'All fields are required' });
+    }
+
     const plant = await Plant.findOne({ _id: plantId, userId: req.user.id });
     if (!plant) return res.status(404).json({ error: 'Plant not found' });
 
@@ -42,11 +46,13 @@ router.post('/:plantId/reminders', auth, async (req, res) => {
     plant.reminders.push(reminder);
     await plant.save();
 
-    res.status(200).json({ message: 'Reminder added', plant });
+    res.status(200).json({ message: 'Reminder added successfully' });
   } catch (error) {
+    console.error('Failed to add reminder:', error);
     res.status(500).json({ error: 'Failed to add reminder' });
   }
 });
+
 
 
 // GET /api/v1/plants?name=Aloe&species=Succulent
